@@ -885,7 +885,7 @@ textarea{ resize: vertical; min-height: 110px; }
         <div class="founder-avatar">MV</div>
         <div class="founder-info">
           <span class="founder-badge">Fundadora del Directorio</span>
-          <h3>Mariángel Vivas</h3>
+          <h3>Mariangel Vivas</h3>
           <p>Analista de Sistemas · Comunidades &amp; automatizaciones a la medida</p>
         </div>
         <button type="button" class="founder-cta" id="founder-cta-btn">Ver Perfil →</button>
@@ -979,7 +979,7 @@ const STORAGE_KEY = "directorio_registros_v3";
 
 // Perfil fijo de la fundadora (no viene de la hoja de cálculo).
 const FOUNDER_PROFILE = {
-  name: "Mariángel Vivas",
+  name: "Mariangel Vivas",
   profession: "Analista de Sistemas",
   niche: "Comunidades & Automatizaciones",
   country: "Colombia",
@@ -1085,10 +1085,15 @@ function hasBothRegistros(){
 /* -----------------------------------------------------------
    3.2. PRECARGA SILENCIOSA DEL DIRECTORIO
    ----------------------------------------------------------- */
+// Evita que la precarga en segundo plano sobreescriba datos ya frescos
+// si el usuario envía su registro mientras esa precarga todavía está en curso.
+let registroEnviado = false;
+
 async function preloadDirectoryData(){
   try{
     const res = await fetch(API_URL, { method: "GET" });
     const data = await res.json();
+    if(registroEnviado) return; // ya hay datos más recientes, no los pisamos
     directoryData = Array.isArray(data) ? data : (data.data || []);
     dataLoaded = true;
   }catch(err){
@@ -1360,7 +1365,16 @@ form.addEventListener("submit", async (e)=>{
       return;
     }
 
-    dataLoaded = false; // fuerza recarga fresca del directorio
+    registroEnviado = true; // bloquea que la precarga vieja sobreescriba lo nuevo
+    try{
+      const freshRes = await fetch(API_URL, { method: "GET" });
+      const freshData = await freshRes.json();
+      directoryData = Array.isArray(freshData) ? freshData : (freshData.data || []);
+      dataLoaded = true;
+    }catch(refreshErr){
+      console.warn("No se pudo refrescar el directorio tras el envío:", refreshErr);
+      dataLoaded = false; // se reintentará la próxima vez que se abra el Directorio
+    }
 
     if(formMode === "edit"){
       const registros = getLocalRegistros();
