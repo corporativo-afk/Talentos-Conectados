@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Talentos Conectados | Emprendedores &amp; Freelancers</title>
+<meta name="description" content="Talentos Conectados: encuentra clientes y profesionales, y crezcamos juntos en redes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   Talentos Conectados — ESTILOS
+   Paleta base (dada por el cliente):
+     --cream   #EFECE3
+     --blue-lt #8FABD4
+     --blue-dk #4A70A9
+     --ink     #000000
+   Se derivan solo TONOS de esos mismos colores (sin agregar
+   matices nuevos) para dar profundidad: un azul-noche oscuro
+   para los degradados, y variantes de opacidad para las
+   "burbujas" decorativas.
+   ========================================================= */
+
+:root{
+  --cream: #EFECE3;
+  --cream-soft: #F7F5EF;
+  --blue-lt: #8FABD4;
+  --blue-dk: #4A70A9;
+  --navy: #182742;         /* tono oscuro derivado de blue-dk, para profundidad */
+  --ink: #000000;
+  --white: #FFFFFF;
+  --ink-soft: #2b2b28;
+  --border: rgba(0,0,0,0.12);
+  --shadow: 0 10px 30px rgba(20,30,50,0.12);
+  --shadow-lg: 0 20px 50px rgba(15,25,50,0.22);
+  --radius: 18px;
+  --radius-sm: 12px;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+*{ box-sizing: border-box; }
+html{ scroll-behavior: smooth; }
+
+body{
+  margin:0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1,h2,h3{
+  font-family: var(--font-display);
+  margin: 0 0 .4em 0;
+  letter-spacing: -0.01em;
+}
+
+button{ font-family: var(--font-body); cursor:pointer; }
+:focus-visible{ outline: 3px solid var(--blue-dk); outline-offset: 2px; }
+
+.hidden{ display:none !important; }
+
+@keyframes floaty{
+  0%,100%{ transform: translateY(0) translateX(0); }
+  50%{ transform: translateY(-16px) translateX(8px); }
+}
+@keyframes pulseDot{
+  0%,100%{ box-shadow: 0 0 0 0 rgba(143,171,212,.55); }
+  50%{ box-shadow: 0 0 0 6px rgba(143,171,212,0); }
+}
+@keyframes drift{
+  0%{ transform: translate(0,0) rotate(0deg); }
+  50%{ transform: translate(-10px, 14px) rotate(8deg); }
+  100%{ transform: translate(0,0) rotate(0deg); }
+}
+
+.blob{
+  position:absolute;
+  border-radius:50%;
+  filter: blur(2px);
+  opacity:.5;
+  pointer-events:none;
+  animation: floaty 7s ease-in-out infinite;
+}
+
+/* ===================== NAV GLOBAL ===================== */
+#global-nav{
+  position: sticky;
+  top:0;
+  z-index: 40;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 14px 24px;
+  background: var(--ink);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.brand{
+  font-family: var(--font-display);
+  font-weight:700;
+  font-size: 1.05rem;
+  display:flex; align-items:center; gap:8px;
+  color: var(--white);
+}
+.brand-dot{
+  width:11px; height:11px; border-radius:50%;
+  background: var(--blue-lt);
+  display:inline-block;
+  animation: pulseDot 2.4s ease-in-out infinite;
+}
+.nav-actions{ display:flex; gap:8px; flex-wrap:wrap; }
+.nav-btn{
+  border: 1.5px solid var(--blue-lt);
+  background: transparent;
+  color: var(--white);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-weight:600;
+  font-size:.88rem;
+  transition: all .18s ease;
+}
+.nav-btn:hover:not(:disabled){ background: var(--blue-dk); border-color: var(--blue-dk); transform: translateY(-1px); }
+.nav-btn.guide-btn{ border-color: rgba(255,255,255,0.35); }
+.nav-btn.guide-btn:hover{ background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.35); }
+.nav-btn.locked{
+  border-color: rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.4);
+  cursor:not-allowed;
+  background: transparent;
+}
+.nav-btn.locked:hover{ transform:none; background:transparent; }
+.lock-icon{ font-size:.8rem; }
+
+/* ===================== VISTAS ===================== */
+.view{ display:none; }
+.view.active{ display:block; }
+
+#app{ max-width: 920px; margin: 0 auto; padding: 0 20px 90px; position:relative; }
+
+/* ---------- HERO ---------- */
+.hero{
+  position:relative;
+  padding: 60px 8px 46px;
+  overflow:hidden;
+  margin: 0 -20px 0;
+  padding-left: 28px; padding-right: 28px;
+  background: linear-gradient(135deg, var(--blue-dk) 0%, var(--navy) 100%);
+  color: var(--white);
+  border-radius: 0 0 32px 32px;
+}
+.hero .blob{ background: var(--blue-lt); }
+.hero .blob.b1{ width:220px; height:220px; top:-60px; right:-40px; animation-duration:9s; }
+.hero .blob.b2{ width:120px; height:120px; bottom:-30px; left:10%; opacity:.25; animation-duration:6s; animation-delay:1s; }
+.hero .blob.b3{ width:70px; height:70px; top:40%; right:18%; opacity:.3; animation-duration:8s; animation-delay:2s; }
+
+.hero-network{
+  position:absolute;
+  right:-20px; top:-6px;
+  width: 320px; opacity:.35;
+  pointer-events:none;
+}
+.hero-network svg{ width:100%; height:auto; }
+.net-line{ stroke: var(--blue-lt); stroke-width:1.4; }
+.net-dot{ fill: var(--white); }
+
+.hero-content{ position:relative; max-width: 640px; z-index:2; }
+.eyebrow{
+  display:inline-block;
+  font-size:.75rem;
+  font-weight:700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--navy);
+  background: var(--cream);
+  padding: 6px 14px;
+  border-radius: 999px;
+  margin-bottom: 18px;
+}
+.hero h1{
+  font-size: clamp(1.9rem, 4vw, 2.7rem);
+  font-weight: 700;
+  color: var(--white);
+}
+.hero-text{ font-size:1.02rem; color: rgba(255,255,255,0.88); max-width: 580px; }
+.hero-guide-line{
+  display:inline-flex; align-items:center; gap:8px;
+  margin-top:16px; font-size:.88rem; font-weight:600;
+  color: var(--cream); background: rgba(255,255,255,0.12);
+  padding: 8px 14px; border-radius: 999px; border:1px solid rgba(255,255,255,0.25);
+}
+
+/* ---------- HINT BOX (guía corta en el form) ---------- */
+.form-hint-box{
+  background: var(--navy);
+  color: var(--white);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  margin: 22px 0;
+  font-size:.92rem;
+  display:flex; gap:12px; align-items:flex-start;
+}
+.form-hint-box .hb-icon{ font-size:1.3rem; flex-shrink:0; }
+.form-hint-box strong{ color: var(--blue-lt); }
+
+.edit-banner{
+  background: rgba(74,112,169,0.14);
+  border: 1.5px dashed var(--blue-dk);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  margin: 18px 0;
+  font-size:.9rem;
+  color: var(--navy);
+}
+
+/* ---------- FORM ---------- */
+#registration-form{
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 32px;
+  margin-top: 10px;
+  border: 1px solid rgba(74,112,169,0.1);
+}
+.field-group{
+  border:none;
+  padding:0;
+  margin: 0 0 30px 0;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 26px;
+}
+.field-group:last-of-type{ border-bottom:none; }
+legend{
+  font-family: var(--font-display);
+  font-weight:700;
+  font-size:1.05rem;
+  padding:0; margin-bottom: 6px;
+  color: var(--blue-dk);
+}
+.field-hint{ font-size:.85rem; color:#666; margin: 2px 0 10px; }
+.field{ margin-bottom: 18px; }
+.field:last-child{ margin-bottom:0; }
+label{ display:block; font-weight:600; font-size:.9rem; margin-bottom: 6px; }
+.req{ color: var(--blue-dk); }
+.opt{ color:#8a8a85; font-weight:400; font-size:.8rem; }
+
+input[type=text], input[type=tel], input[type=email], input[type=url], input[type=search],
+select, textarea{
+  width:100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: .95rem;
+  background: var(--cream-soft);
+  color: var(--ink);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+input:focus, select:focus, textarea:focus{
+  border-color: var(--blue-dk);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(74,112,169,0.15);
+}
+input:disabled, select:disabled, textarea:disabled{ opacity:.6; cursor:not-allowed; }
+textarea{ resize: vertical; min-height: 110px; }
+.char-counter{ display:block; text-align:right; font-size:.78rem; color:#888; margin-top:4px; }
+.conditional-input{ margin-top:10px; }
+
+.radio-row{ display:flex; gap:14px; flex-wrap:wrap; }
+.radio-card{
+  flex:1 1 200px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  background: var(--cream-soft);
+  cursor:pointer;
+  display:flex; flex-direction:column; gap:2px;
+  position:relative;
+  transition: border-color .15s ease, background .15s ease, transform .15s ease;
+}
+.radio-card:hover{ transform: translateY(-2px); }
+.radio-card input{ position:absolute; top:14px; right:14px; width:18px; height:18px; accent-color: var(--blue-dk); }
+.radio-card span{ font-weight:700; }
+.radio-card small{ color:#666; }
+.radio-card:has(input:checked){ border-color: var(--blue-dk); background: rgba(143,171,212,0.2); box-shadow: 0 0 0 2px rgba(74,112,169,0.15); }
+
+#submit-btn{
+  width:100%;
+  padding: 16px;
+  background: linear-gradient(120deg, var(--blue-dk), var(--navy));
+  color: var(--white);
+  border:none;
+  border-radius: 999px;
+  font-weight:700;
+  font-size: 1rem;
+  margin-top: 8px;
+  transition: transform .15s ease, box-shadow .15s ease;
+  box-shadow: 0 8px 20px rgba(74,112,169,0.35);
+}
+#submit-btn:hover:not(:disabled){ transform: translateY(-2px); box-shadow: 0 12px 26px rgba(74,112,169,0.45); }
+#submit-btn:disabled{ opacity:.6; cursor:wait; transform:none; }
+.form-footnote{ text-align:center; font-size:.8rem; color:#888; margin-top:12px; }
+.form-footnote a{ color: var(--blue-dk); font-weight:600; }
+
+#cancel-edit-btn{
+  display:block;
+  width:100%;
+  text-align:center;
+  background:none;
+  border:1.5px solid var(--border);
+  color:#777;
+  padding:10px;
+  border-radius:999px;
+  font-weight:600;
+  margin-top:10px;
+  font-size:.85rem;
+}
+#cancel-edit-btn:hover{ border-color: var(--ink); color: var(--ink); }
+
+/* ---------- CONFIRMATION ---------- */
+#view-confirmation{ padding-top: 60px; }
+.confirmation-card{
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 48px 36px;
+  text-align:center;
+  max-width: 580px;
+  margin: 0 auto;
+  border-top: 6px solid var(--blue-dk);
+}
+.confirmation-icon{ font-size: 3rem; margin-bottom: 6px; }
+.confirmation-text{ color: var(--ink-soft); }
+.pledge-box{
+  background: var(--navy);
+  color: var(--white);
+  border-radius: var(--radius-sm);
+  padding: 18px 20px;
+  text-align:left;
+  margin: 22px 0;
+  font-size: .92rem;
+}
+.pledge-box strong{ color: var(--blue-lt); }
+.pledge-box p{ margin: 8px 0 0; color: rgba(255,255,255,0.9); }
+#go-dashboard-btn{
+  background: linear-gradient(120deg, var(--blue-dk), var(--navy));
+  color: var(--white);
+  border:none;
+  padding: 14px 30px;
+  border-radius: 999px;
+  font-weight:700;
+  font-size: 1rem;
+  box-shadow: 0 8px 20px rgba(74,112,169,0.35);
+}
+#go-dashboard-btn:hover{ transform: translateY(-2px); }
+
+/* ---------- DASHBOARD ---------- */
+.dashboard-header{ padding-top: 34px; position:relative; }
+.dashboard-header .blob{ background: var(--blue-lt); }
+.dashboard-header .blob.d1{ width:150px; height:150px; top:-20px; right:-50px; opacity:.18; }
+
+.directory-intro{
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 22px 26px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+  border-left: 6px solid var(--blue-dk);
+}
+.directory-intro h2{ font-size:1.15rem; color: var(--navy); }
+.directory-intro p{ margin:0; color: var(--ink-soft); font-size:.95rem; }
+
+.banner{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  background: var(--ink);
+  color: var(--white);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  margin-bottom: 22px;
+  font-size: .92rem;
+}
+.banner strong{ color: var(--blue-lt); }
+.banner p{ margin:0; }
+#banner-close{ background:none; border:none; font-size:1rem; color: var(--white); flex-shrink:0; opacity:.7; }
+#banner-close:hover{ opacity:1; }
+
+/* --- Perfil destacado de la fundadora --- */
+.founder-card{
+  background: linear-gradient(120deg, var(--navy), var(--blue-dk));
+  color: var(--white);
+  border-radius: var(--radius);
+  padding: 24px 26px;
+  margin-bottom: 22px;
+  display:flex; align-items:center; gap:18px; flex-wrap:wrap;
+  box-shadow: var(--shadow-lg);
+  position:relative;
+  overflow:hidden;
+}
+.founder-card::after{
+  content:"";
+  position:absolute; right:-30px; bottom:-40px;
+  width:140px; height:140px; border-radius:50%;
+  background: rgba(255,255,255,0.08);
+}
+.founder-avatar{
+  width:64px; height:64px; border-radius:50%;
+  background: var(--cream);
+  color: var(--navy);
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--font-display); font-weight:700; font-size:1.4rem;
+  flex-shrink:0; border: 3px solid rgba(255,255,255,0.4);
+}
+.founder-info{ flex:1 1 260px; z-index:1; }
+.founder-badge{
+  display:inline-block; font-size:.7rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.06em;
+  background: rgba(255,255,255,0.18); padding:3px 10px; border-radius:999px;
+  margin-bottom:6px;
+}
+.founder-info h3{ margin:0 0 2px; color:var(--white); }
+.founder-info p{ margin:0; font-size:.88rem; color: rgba(255,255,255,0.85); }
+.founder-cta{
+  background: var(--white); color: var(--navy);
+  border:none; padding: 12px 22px; border-radius:999px;
+  font-weight:700; font-size:.9rem; flex-shrink:0; z-index:1;
+}
+.founder-cta:hover{ background: var(--cream); transform: translateY(-2px); }
+
+/* --- Mis perfiles --- */
+.my-profiles{ margin-bottom: 22px; }
+.my-profiles-title{ font-size:.85rem; font-weight:700; color:#777; text-transform:uppercase; letter-spacing:.04em; margin-bottom:10px; }
+.my-profile-chip{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  background: var(--white); border: 1.5px solid var(--blue-lt);
+  border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom:8px;
+}
+.my-profile-chip .chip-info{ font-size:.88rem; }
+.my-profile-chip .chip-info b{ color: var(--blue-dk); }
+.chip-edit-btn{
+  background: var(--blue-dk); color:var(--white); border:none;
+  padding: 8px 14px; border-radius:999px; font-weight:700; font-size:.82rem;
+  flex-shrink:0;
+}
+.chip-edit-btn:hover{ background: var(--ink); }
+.chip-locked{
+  font-size:.78rem; color:#999; font-weight:600; flex-shrink:0;
+  display:flex; align-items:center; gap:4px;
+}
+
+.tabs{ display:flex; gap:10px; margin-bottom: 20px; }
+.tab-btn{
+  flex:1;
+  padding: 16px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  font-weight:700;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--ink-soft);
+  transition: all .18s ease;
+}
+.tab-btn:hover{ border-color: var(--blue-lt); }
+.tab-btn.active{ background: linear-gradient(120deg, var(--blue-dk), var(--navy)); color: var(--white); border-color: transparent; box-shadow: var(--shadow); }
+
+.filters{
+  display:grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr auto;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.filters select, .filters input{ margin:0; }
+#clear-filters-btn{
+  border: 1.5px solid var(--ink);
+  background: transparent;
+  border-radius: var(--radius-sm);
+  padding: 0 16px;
+  font-weight:600;
+  white-space:nowrap;
+}
+#clear-filters-btn:hover{ background: var(--ink); color: var(--white); }
+
+.results-count{ font-size:.85rem; color:#777; margin: 0 0 14px; }
+
+.loading-state, .empty-state{
+  text-align:center;
+  padding: 50px 20px;
+  color:#777;
+  background: var(--white);
+  border-radius: var(--radius);
+}
+
+.cards-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px,1fr));
+  gap: 16px;
+}
+.profile-card{
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  display:flex; flex-direction:column; gap:6px;
+  border: 1.5px solid transparent;
+  transition: border-color .15s ease, transform .15s ease;
+}
+.profile-card:hover{ border-color: var(--blue-lt); transform: translateY(-3px); }
+.profile-card .card-name{ font-family: var(--font-display); font-weight:700; font-size:1.05rem; }
+.profile-card .card-tag{
+  display:inline-block;
+  font-size:.75rem;
+  font-weight:600;
+  color: var(--white);
+  background: var(--blue-dk);
+  padding: 3px 10px;
+  border-radius: 999px;
+  width: fit-content;
+}
+.profile-card .card-meta{ font-size:.85rem; color:#666; }
+.card-cta{
+  margin-top: 10px;
+  background: var(--ink);
+  color: var(--white);
+  border:none;
+  padding: 10px;
+  border-radius: 999px;
+  font-weight:700;
+  font-size:.88rem;
+}
+.card-cta:hover{ background: var(--blue-dk); }
+
+/* ---------- MODAL ---------- */
+.modal{ position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center; padding:20px; }
+.modal.hidden{ display:none; }
+.modal-overlay{ position:absolute; inset:0; background: rgba(10,15,30,0.6); }
+.modal-content{
+  position:relative;
+  background: var(--cream);
+  border-radius: var(--radius);
+  max-width: 760px;
+  width:100%;
+  max-height: 88vh;
+  overflow-y:auto;
+  padding: 36px;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.35);
+}
+.modal-close{
+  position:absolute; top:16px; right:16px;
+  background: var(--white); border:1px solid var(--border);
+  width:36px; height:36px; border-radius:50%;
+  font-size:1rem;
+}
+.modal-close:hover{ background: var(--ink); color:var(--white); }
+
+.modal-head{ display:flex; align-items:center; gap:14px; margin-bottom: 18px; }
+.modal-avatar{
+  width:56px; height:56px; border-radius:50%;
+  background: var(--blue-dk); color:var(--white);
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--font-display); font-weight:700; font-size:1.3rem;
+  flex-shrink:0;
+}
+.modal-head h2{ margin:0; }
+.modal-head .modal-tags{ display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+.modal-tags span{
+  font-size:.75rem; font-weight:600; color: var(--white);
+  background: var(--blue-dk); padding:3px 10px; border-radius:999px;
+}
+
+.modal-pitch{
+  background: var(--white);
+  border-left: 4px solid var(--blue-dk);
+  border-radius: var(--radius-sm);
+  padding: 18px 20px;
+  white-space: pre-line;
+  margin-bottom: 20px;
+  line-height:1.6;
+}
+
+.modal-contact{ display:flex; flex-direction:column; gap:10px; margin-bottom: 20px; }
+.contact-row{ display:flex; align-items:center; gap:10px; font-size:.92rem; }
+.contact-row a{ color: var(--blue-dk); font-weight:600; text-decoration:none; }
+.contact-row a:hover{ text-decoration: underline; }
+
+.modal-links{ display:flex; gap:10px; flex-wrap:wrap; }
+.link-btn{
+  flex:1 1 140px;
+  text-align:center;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  font-weight:700;
+  font-size:.88rem;
+  text-decoration:none;
+  border: 1.5px solid var(--ink);
+  color: var(--ink);
+  background: var(--white);
+  transition: all .15s ease;
+}
+.link-btn:hover{ background: var(--ink); color: var(--white); transform: translateY(-1px); }
+.link-btn.disabled{
+  border-color: var(--border);
+  color:#aaa;
+  pointer-events:none;
+  background: rgba(0,0,0,0.03);
+}
+.link-btn.whatsapp{ background: var(--blue-dk); color:var(--white); border-color: var(--blue-dk); }
+.link-btn.whatsapp:hover{ background: var(--ink); }
+.link-btn.email{ background: var(--navy); color:var(--white); border-color: var(--navy); }
+
+.guide-content h3{ color: var(--blue-dk); font-size:1.05rem; margin-top:22px; }
+.guide-content h3:first-child{ margin-top:0; }
+.guide-content p, .guide-content li{ font-size:.92rem; color: var(--ink-soft); }
+.guide-content ul{ padding-left: 20px; }
+.guide-content .guide-tag{
+  display:inline-block; background: rgba(74,112,169,0.14); color: var(--blue-dk);
+  font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.05em;
+  padding:4px 10px; border-radius:999px; margin-bottom:14px;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 720px){
+  .filters{ grid-template-columns: 1fr 1fr; }
+  .filters input[type=search]{ grid-column: 1 / -1; }
+  .hero-network{ display:none; }
+  #registration-form{ padding: 22px; }
+  .tabs{ flex-direction:column; }
+  #global-nav{ padding: 12px 16px; }
+  .founder-card{ flex-direction:column; text-align:center; }
+}
+@media (max-width: 480px){
+  .filters{ grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ transition: none !important; scroll-behavior:auto !important; animation: none !important; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ===================== NAV GLOBAL ===================== -->
+<nav id="global-nav">
+  <div class="brand">
+    <span class="brand-dot" aria-hidden="true"></span>
+    Talentos Conectados
+  </div>
+  <div class="nav-actions">
+    <button type="button" class="nav-btn guide-btn" id="nav-guide-btn">📖 Guía</button>
+    <button type="button" class="nav-btn" data-goto="form" id="nav-form-btn">Registro</button>
+    <button type="button" class="nav-btn locked" data-goto="dashboard" id="nav-dashboard-btn" disabled>
+      <span class="lock-icon" aria-hidden="true">🔒</span> Directorio
+    </button>
+  </div>
+</nav>
+
+<div id="app">
+
+  <!-- ===================== VISTA 1: FORMULARIO DE REGISTRO ===================== -->
+  <section id="view-form" class="view active">
+
+    <header class="hero">
+      <span class="blob b1" aria-hidden="true"></span>
+      <span class="blob b2" aria-hidden="true"></span>
+      <span class="blob b3" aria-hidden="true"></span>
+      <div class="hero-network" aria-hidden="true">
+        <svg viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg">
+          <line x1="40" y1="60" x2="150" y2="40" class="net-line"/>
+          <line x1="150" y1="40" x2="260" y2="90" class="net-line"/>
+          <line x1="260" y1="90" x2="360" y2="50" class="net-line"/>
+          <line x1="150" y1="40" x2="120" y2="150" class="net-line"/>
+          <line x1="260" y1="90" x2="220" y2="190" class="net-line"/>
+          <line x1="120" y1="150" x2="220" y2="190" class="net-line"/>
+          <line x1="220" y1="190" x2="330" y2="210" class="net-line"/>
+          <line x1="40" y1="60" x2="120" y2="150" class="net-line"/>
+          <circle cx="40" cy="60" r="6" class="net-dot"/>
+          <circle cx="150" cy="40" r="7" class="net-dot"/>
+          <circle cx="260" cy="90" r="6" class="net-dot"/>
+          <circle cx="360" cy="50" r="5" class="net-dot"/>
+          <circle cx="120" cy="150" r="7" class="net-dot"/>
+          <circle cx="220" cy="190" r="6" class="net-dot"/>
+          <circle cx="330" cy="210" r="5" class="net-dot"/>
+        </svg>
+      </div>
+      <div class="hero-content">
+        <span class="eyebrow">Comunidad de Emprendedores &amp; Freelancers</span>
+        <h1>Un directorio para encontrarnos y crecer juntos</h1>
+        <p class="hero-text">
+          Este directorio aloja a todos los talentos de la comunidad: clientes que buscan
+          contratar y profesionales que ofrecen sus servicios, todos en un solo lugar para
+          encontrarnos, seguirnos y ayudarnos mutuamente a crecer. Regístrate, explora el
+          directorio y sigue las redes de quienes encuentres. Meta de la comunidad: entre
+          todos, <strong>mínimo 500 seguidores nuevos por persona en los próximos 10 días</strong>. 🤝
+        </p>
+        <span class="hero-guide-line">📖 ¿No sabes cómo funciona? Toca "Guía" arriba</span>
+      </div>
+    </header>
+
+    <div class="form-hint-box" id="form-hint-create">
+      <span class="hb-icon">💡</span>
+      <div>
+        <strong>Antes de enviar:</strong> revisa bien tus datos. Puedes registrarte hasta 2 veces
+        (una como Cliente y una como Profesional), pero cada registro solo se puede
+        <strong>editar una vez</strong>. Si te equivocas después de esa edición, o necesitas
+        otro cambio, escríbenos a <a href="mailto:corporativo@aurushen.com">corporativo@aurushen.com</a>.
+      </div>
+    </div>
+
+    <div class="edit-banner hidden" id="form-hint-edit">
+      ✏️ Estás <strong>editando</strong> tu registro. Esta es tu única oportunidad de corregirlo,
+      así que revisa bien antes de guardar. El rol (Cliente/Profesional) no se puede cambiar.
+    </div>
+
+    <form id="registration-form" novalidate>
+
+      <!-- ROL -->
+      <fieldset class="field-group">
+        <legend>¿Cómo participas en la comunidad? <span class="req">*</span></legend>
+        <p class="field-hint">Esto define en qué directorio aparecerás. Puedes registrarte como ambos (máximo 1 vez cada uno).</p>
+        <div class="radio-row">
+          <label class="radio-card">
+            <input type="radio" name="role" value="Cliente" required>
+            <span>Soy Cliente</span>
+            <small>Busco contratar servicios</small>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="role" value="Profesional" required>
+            <span>Soy Profesional</span>
+            <small>Ofrezco un servicio</small>
+          </label>
+        </div>
+      </fieldset>
+
+      <!-- DATOS BÁSICOS -->
+      <fieldset class="field-group">
+        <legend>Datos básicos</legend>
+
+        <div class="field">
+          <label for="name">Nombre o Marca Personal <span class="req">*</span></label>
+          <input type="text" id="name" name="name" maxlength="60" placeholder="Ej. Laura Gómez / Estudio Creativo LG" required>
+        </div>
+
+        <div class="field">
+          <label for="country">País <span class="req">*</span></label>
+          <select id="country" name="country" required>
+            <option value="" disabled selected>Selecciona tu país</option>
+          </select>
+        </div>
+      </fieldset>
+
+      <!-- PROFESIÓN Y NICHO -->
+      <fieldset class="field-group">
+        <legend>Especialidad</legend>
+
+        <div class="field">
+          <label for="profession">Profesión / Servicio principal <span class="req">*</span></label>
+          <select id="profession" name="profession" required>
+            <option value="" disabled selected>Selecciona una opción</option>
+          </select>
+          <input type="text" id="profession-other" class="conditional-input hidden" maxlength="60" placeholder="Cuéntanos cuál es tu profesión o servicio">
+        </div>
+
+        <div class="field">
+          <label for="niche">Nicho <span class="req">*</span></label>
+          <select id="niche" name="niche" required>
+            <option value="" disabled selected>Selecciona una opción</option>
+          </select>
+          <input type="text" id="niche-other" class="conditional-input hidden" maxlength="60" placeholder="Cuéntanos cuál es tu nicho">
+        </div>
+      </fieldset>
+
+      <!-- PITCH -->
+      <fieldset class="field-group">
+        <div class="field">
+          <label for="pitch">Mini-Pitch / Preséntate <span class="req">*</span></label>
+          <p class="field-hint">Cuéntanos quién eres, qué haces y qué buscas. Este texto se mostrará en tu perfil completo, así que dale contexto. Ej: "Ayudo a marcas de e-commerce a vender más con videos que sí convierten. Llevo 3 años trabajando con marcas de belleza y moda..."</p>
+          <textarea id="pitch" name="pitch" maxlength="400" rows="5" required placeholder="Describe quién eres, qué haces o qué buscas..."></textarea>
+          <span class="char-counter"><span id="pitch-count">0</span>/400</span>
+        </div>
+      </fieldset>
+
+      <!-- CONTACTO -->
+      <fieldset class="field-group">
+        <legend>Contacto</legend>
+
+        <div class="field">
+          <label for="whatsapp">WhatsApp / Teléfono <span class="req">*</span></label>
+          <p class="field-hint">Incluye el código de país. Ej: +57 300 1234567</p>
+          <input type="tel" id="whatsapp" name="whatsapp" placeholder="+57 300 1234567" required>
+        </div>
+
+        <div class="field">
+          <label for="email">Correo Electrónico <span class="req">*</span></label>
+          <input type="email" id="email" name="email" placeholder="tucorreo@email.com" required>
+        </div>
+      </fieldset>
+
+      <!-- REDES -->
+      <fieldset class="field-group">
+        <legend>Redes y enlaces</legend>
+
+        <div class="field">
+          <label for="instagram">Link de Instagram <span class="req">*</span></label>
+          <p class="field-hint">Obligatorio: es la base de la comunidad, para poder seguirnos entre todos.</p>
+          <input type="url" id="instagram" name="instagram" placeholder="https://instagram.com/tuusuario" required>
+        </div>
+
+        <div class="field">
+          <label for="tiktok">Link de TikTok <span class="opt">(opcional)</span></label>
+          <input type="url" id="tiktok" name="tiktok" placeholder="https://tiktok.com/@tuusuario">
+        </div>
+
+        <div class="field">
+          <label for="portfolio">Link a Portafolio / Web <span class="opt">(opcional)</span></label>
+          <input type="url" id="portfolio" name="portfolio" placeholder="https://tusitio.com">
+        </div>
+
+        <div class="field">
+          <label for="linkedin">Link de LinkedIn <span class="opt">(opcional)</span></label>
+          <input type="url" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/tuusuario">
+        </div>
+      </fieldset>
+
+      <button type="submit" id="submit-btn">
+        <span id="submit-btn-text">Registrarme y desbloquear el Directorio</span>
+      </button>
+      <button type="button" id="cancel-edit-btn" class="hidden">Cancelar edición</button>
+      <p class="form-footnote">
+        Al registrarte, tu Instagram quedará visible para que la comunidad pueda seguirte.
+        Evita enviar el formulario más de una vez por rol: el sistema detecta si tu Instagram
+        o correo ya están registrados en ese rol. Cada registro se puede editar una sola vez
+        desde el Directorio. ¿Otro problema? Escribe a <a href="mailto:corporativo@aurushen.com">corporativo@aurushen.com</a>.
+      </p>
+    </form>
+  </section>
+
+  <!-- ===================== VISTA 2: CONFIRMACIÓN ===================== -->
+  <section id="view-confirmation" class="view">
+    <div class="confirmation-card">
+      <div class="confirmation-icon">🎉</div>
+      <h2 id="confirmation-title">¡Listo, ya estás dentro!</h2>
+      <p class="confirmation-text" id="confirmation-text">
+        Tu registro fue recibido. Ya puedes explorar el directorio, seguir a la
+        comunidad en Instagram y empezar a apoyarnos entre todos.
+      </p>
+      <div class="pledge-box">
+        <strong>El compromiso de esta comunidad:</strong>
+        <p>Somos cerca de 700 emprendedores y freelancers. Si cada uno sigue,
+          comenta y apoya a los demás, en los próximos 10 días podemos conseguir
+          entre todos <strong>mínimo 500 seguidores nuevos por persona</strong>.
+          Entra al directorio, sigue a quienes encuentres y crezcamos juntos. 🤝📈</p>
+      </div>
+      <button type="button" id="go-dashboard-btn">Ir al Directorio →</button>
+    </div>
+  </section>
+
+  <!-- ===================== VISTA 3: DASHBOARD / DIRECTORIO ===================== -->
+  <section id="view-dashboard" class="view">
+
+    <div class="dashboard-header">
+      <span class="blob d1" aria-hidden="true"></span>
+      <h1>Talentos Conectados</h1>
+
+      <div class="directory-intro">
+        <h2>¿Qué es esto? 🌐</h2>
+        <p>Este directorio aloja a todos los talentos de nuestra comunidad de emprendedores
+          y freelancers: aquí encuentras tanto a quienes ofrecen servicios (Profesionales) como
+          a quienes buscan contratarlos (Clientes). La idea es simple: si nos conocemos, nos
+          ayudamos. Explora los perfiles, escribe, contrata, colabora y sobre todo... ¡síguenos!</p>
+      </div>
+
+      <div class="banner" id="pledge-banner">
+        <p><strong>Crezcamos juntos:</strong> sigue el Instagram de cada persona que encuentres aquí.
+          Es la forma más simple de apoyarnos. Meta de la comunidad: +500 seguidores por persona en 10 días. 🤝</p>
+        <button type="button" id="banner-close" aria-label="Cerrar aviso">✕</button>
+      </div>
+
+      <!-- Perfil fijo de la fundadora -->
+      <div class="founder-card">
+        <div class="founder-avatar">MV</div>
+        <div class="founder-info">
+          <span class="founder-badge">Fundadora del Directorio</span>
+          <h3>Mariángel Vivas</h3>
+          <p>Analista de Sistemas · Comunidades &amp; automatizaciones a la medida</p>
+        </div>
+        <button type="button" class="founder-cta" id="founder-cta-btn">Ver Perfil →</button>
+      </div>
+
+      <!-- Mis perfiles (solo si el usuario ya se registró en este dispositivo) -->
+      <div class="my-profiles hidden" id="my-profiles-section">
+        <p class="my-profiles-title">Mis perfiles registrados</p>
+        <div id="my-profiles-list"></div>
+      </div>
+    </div>
+
+    <nav class="tabs" role="tablist">
+      <button class="tab-btn" data-role="Cliente" role="tab" aria-selected="false">Directorio de Clientes</button>
+      <button class="tab-btn active" data-role="Profesional" role="tab" aria-selected="true">Directorio de Profesionales</button>
+    </nav>
+
+    <div class="filters">
+      <input type="search" id="search-input" placeholder="Buscar por nombre...">
+      <select id="filter-country"><option value="">Todos los países</option></select>
+      <select id="filter-profession"><option value="">Todas las profesiones</option></select>
+      <select id="filter-niche"><option value="">Todos los nichos</option></select>
+      <button type="button" id="clear-filters-btn">Limpiar filtros</button>
+    </div>
+
+    <p id="results-count" class="results-count"></p>
+
+    <div id="loading-state" class="loading-state hidden">Cargando directorio...</div>
+    <div id="cards-grid" class="cards-grid"></div>
+    <p id="empty-state" class="empty-state hidden">No encontramos a nadie con esos filtros. Intenta ajustarlos 🔍</p>
+  </section>
+
+</div>
+
+<!-- ===================== MODAL: PERFIL COMPLETO ===================== -->
+<div id="profile-modal" class="modal hidden" aria-hidden="true">
+  <div class="modal-overlay" id="modal-overlay"></div>
+  <div class="modal-content" role="dialog" aria-modal="true">
+    <button type="button" class="modal-close" id="modal-close" aria-label="Cerrar">✕</button>
+    <div class="modal-body" id="modal-body"><!-- generado por JS --></div>
+  </div>
+</div>
+
+<!-- ===================== MODAL: GUÍA ===================== -->
+<div id="guide-modal" class="modal hidden" aria-hidden="true">
+  <div class="modal-overlay" id="guide-modal-overlay"></div>
+  <div class="modal-content" role="dialog" aria-modal="true">
+    <button type="button" class="modal-close" id="guide-modal-close" aria-label="Cerrar">✕</button>
+    <div class="modal-body guide-content">
+      <span class="guide-tag">Guía rápida</span>
+      <h2>¿Cómo funciona el Directorio?</h2>
+
+      <h3>1. Regístrate</h3>
+      <p>Llena el formulario de "Registro" en la barra de arriba. Elige si participas como
+        <strong>Cliente</strong> (buscas contratar) o <strong>Profesional</strong> (ofreces un servicio).
+        Puedes registrarte en ambos roles si aplica para ti, pero solo una vez por rol.</p>
+
+      <h3>2. Explora el Directorio</h3>
+      <p>Apenas envíes tu primer registro, se desbloquea el botón "Directorio". Ahí puedes ver
+        los perfiles de Clientes y Profesionales, filtrar por país, profesión o nicho, y abrir
+        el perfil completo de cada persona con sus redes y contacto.</p>
+
+      <h3>3. Síguenos entre todos</h3>
+      <p>La comunidad crece si nos apoyamos: sigue el Instagram de cada persona que encuentres.
+        La meta es conseguir entre todos mínimo 500 seguidores nuevos por persona en 10 días. 🤝</p>
+
+      <h3>4. Si te equivocas</h3>
+      <p>Cada registro tiene <strong>una sola edición disponible</strong>. Ve al Directorio, busca
+        la sección "Mis perfiles registrados" y usa el botón "Editar". Una vez usada esa edición,
+        el botón se bloquea. Para cualquier otro cambio, escríbenos a
+        <a href="mailto:corporativo@aurushen.com">corporativo@aurushen.com</a>.</p>
+
+      <h3>5. ¿Necesitas un sistema como este?</h3>
+      <p>Este directorio fue creado por Mariángel, quien también diseña sistemas a la medida
+        para negocios y comunidades. Revisa su perfil (fijado arriba en el Directorio) para más info.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   Talentos Conectados — LÓGICA (Vanilla JS)
+   ========================================================= */
+
+/* -----------------------------------------------------------
+   1. CONFIGURACIÓN
+   ----------------------------------------------------------- */
+const API_URL = "https://script.google.com/macros/s/AKfycbw9_kuW0EUmiDg8nyuqBMLg7-k1cmaxihqht3DGVGWXnHqpr7UNViU0-q_hZG19sumR/exec";
+
+const STORAGE_KEY = "directorio_registros_v3";
+
+// Perfil fijo de la fundadora (no viene de la hoja de cálculo).
+const FOUNDER_PROFILE = {
+  name: "Mariángel Vivas",
+  profession: "Analista de Sistemas",
+  niche: "Comunidades & Automatizaciones",
+  country: "Colombia",
+  pitch: "Mariángel | Analista de Sistemas y Arquitecta Digital ⚙️\n\nNo construyo webs de adorno; resuelvo cuellos de botella tecnológicos. Analizo el funcionamiento de tu negocio, identifico dónde estás perdiendo tiempo o dinero (fricciones) y diseño sistemas a la medida de lo que realmente necesitas.\n\n¿Qué problemas resuelvo?\n\nCaos de prospectos: ¿Tienes a tu comunidad y posibles clientes regados por chats y correos? Los alojo y organizo en un solo lugar (Skool) con automatizaciones estratégicas para que puedas vender incluso mientras duermes.\n\nHerramientas desconectadas: Conecto una plataforma con otra para que \"hablen\" entre sí, mejorando tu flujo de trabajo y eliminando el copiar y pegar manual.\n\nDesarrollo a medida: Si tienes un problema específico, creo soluciones precisas, ágiles y sencillas (justo como este Directorio que estás usando), desde bases de datos y formularios hasta ecosistemas completos.\n\nTu negocio debe trabajar para ti, no tú para él. Si necesitas sistematizar tu operación, delegar la tecnología y escalar sin estrés, entra a mis redes sociales aquí abajo y contáctame. 👇🏽",
+  email: "corporativo@aurushen.com",
+  instagram: "https://www.instagram.com/aurushen_systems/",
+  tiktok: "https://www.tiktok.com/@aurushen_systems",
+  linkedin: "https://www.linkedin.com/in/mariangel-vivas-4791aa2b9/",
+  whatsapp: "",
+  portfolio: ""
+};
+
+/* -----------------------------------------------------------
+   2. CATÁLOGOS (usados en el form Y en los filtros del dashboard)
+   ----------------------------------------------------------- */
+const COUNTRIES = [
+  "Argentina","Bolivia","Chile","Colombia","Costa Rica","Cuba","Ecuador",
+  "El Salvador","España","Estados Unidos (hispanohablante)","Guatemala",
+  "Guinea Ecuatorial","Honduras","México","Nicaragua","Panamá","Paraguay",
+  "Perú","Puerto Rico","República Dominicana","Uruguay","Venezuela","Otro"
+];
+
+const PROFESSIONS = [
+  "Asistencia Virtual","Edición de Video","Diseño Gráfico","Copywriting",
+  "Media Buying / Tráfico","Creador UGC","Desarrollo Web","Embudos de Venta",
+  "Closer de Ventas","Community Manager","Automatizaciones / IA",
+  "Coach / Consultor","Otro"
+];
+
+const NICHES = [
+  "Salud/Fitness","Finanzas","Negocios/B2B","Desarrollo Personal",
+  "Belleza/Moda","E-commerce","Tecnología","Otro"
+];
+
+/* -----------------------------------------------------------
+   3. UTILIDADES
+   ----------------------------------------------------------- */
+function isValidUrl(value){
+  try{
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  }catch(e){
+    return false;
+  }
+}
+
+function normalizeForCompare(value){
+  if(!value) return "";
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//,"")
+    .replace(/^www\./,"")
+    .replace(/\/+$/,"");
+}
+
+function fillSelect(selectEl, options){
+  options.forEach(opt=>{
+    const o = document.createElement("option");
+    o.value = opt;
+    o.textContent = opt;
+    selectEl.appendChild(o);
+  });
+}
+
+function switchView(viewId){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.getElementById(viewId).classList.add("active");
+  window.scrollTo({top:0, behavior:"auto"});
+}
+
+function escapeHtml(str){
+  const div = document.createElement("div");
+  div.textContent = str || "";
+  return div.innerHTML;
+}
+
+/* -----------------------------------------------------------
+   3.1. REGISTROS LOCALES (localStorage)
+   Guardamos, por rol, el id del registro creado en este dispositivo
+   y si ya usó su edición. Esto es lo que nos permite mostrar
+   "Mis perfiles" y bloquear duplicados / ediciones repetidas.
+   Estructura: { Cliente: {id, editado}, Profesional: {id, editado} }
+   ----------------------------------------------------------- */
+function getLocalRegistros(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){ return {}; }
+}
+function saveLocalRegistros(obj){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+}
+function hasAnyRegistro(){
+  const r = getLocalRegistros();
+  return !!(r.Cliente || r.Profesional);
+}
+function hasBothRegistros(){
+  const r = getLocalRegistros();
+  return !!(r.Cliente && r.Profesional);
+}
+
+/* -----------------------------------------------------------
+   3.2. PRECARGA SILENCIOSA DEL DIRECTORIO
+   ----------------------------------------------------------- */
+async function preloadDirectoryData(){
+  try{
+    const res = await fetch(API_URL, { method: "GET" });
+    const data = await res.json();
+    directoryData = Array.isArray(data) ? data : (data.data || []);
+    dataLoaded = true;
+  }catch(err){
+    console.warn("No se pudo precargar el directorio:", err);
+  }
+}
+
+/* -----------------------------------------------------------
+   4. INICIALIZAR SELECTS (form + filtros)
+   ----------------------------------------------------------- */
+fillSelect(document.getElementById("country"), COUNTRIES);
+fillSelect(document.getElementById("profession"), PROFESSIONS);
+fillSelect(document.getElementById("niche"), NICHES);
+
+fillSelect(document.getElementById("filter-country"), COUNTRIES);
+fillSelect(document.getElementById("filter-profession"), PROFESSIONS);
+fillSelect(document.getElementById("filter-niche"), NICHES);
+
+/* -----------------------------------------------------------
+   5. CAMPOS CONDICIONALES "OTRO"
+   ----------------------------------------------------------- */
+function setupOtherField(selectId, otherId){
+  const select = document.getElementById(selectId);
+  const other = document.getElementById(otherId);
+  select.addEventListener("change", ()=>{
+    if(select.value === "Otro"){
+      other.classList.remove("hidden");
+      other.required = true;
+    }else{
+      other.classList.add("hidden");
+      other.required = false;
+      other.value = "";
+    }
+  });
+}
+setupOtherField("profession","profession-other");
+setupOtherField("niche","niche-other");
+
+/* -----------------------------------------------------------
+   6. CONTADOR DE CARACTERES DEL PITCH
+   ----------------------------------------------------------- */
+const pitchEl = document.getElementById("pitch");
+const pitchCount = document.getElementById("pitch-count");
+pitchEl.addEventListener("input", ()=>{
+  pitchCount.textContent = pitchEl.value.length;
+});
+
+/* -----------------------------------------------------------
+   7. MODO DEL FORMULARIO: crear vs editar
+   ----------------------------------------------------------- */
+let formMode = "create";   // "create" | "edit"
+let editingId = null;
+let editingRole = null;
+
+const form = document.getElementById("registration-form");
+const submitBtn = document.getElementById("submit-btn");
+const submitBtnText = document.getElementById("submit-btn-text");
+const cancelEditBtn = document.getElementById("cancel-edit-btn");
+const hintCreate = document.getElementById("form-hint-create");
+const hintEdit = document.getElementById("form-hint-edit");
+const roleInputs = document.querySelectorAll('input[name="role"]');
+
+function enterCreateMode(){
+  formMode = "create";
+  editingId = null;
+  editingRole = null;
+  form.reset();
+  pitchCount.textContent = "0";
+  roleInputs.forEach(r=> r.disabled = false);
+  submitBtnText.textContent = "Registrarme y desbloquear el Directorio";
+  cancelEditBtn.classList.add("hidden");
+  hintCreate.classList.remove("hidden");
+  hintEdit.classList.add("hidden");
+}
+
+function enterEditMode(person, role, id){
+  formMode = "edit";
+  editingId = id;
+  editingRole = role;
+
+  form.querySelector(`input[name="role"][value="${role}"]`).checked = true;
+  roleInputs.forEach(r=> r.disabled = true);
+
+  document.getElementById("name").value = person.name || "";
+  document.getElementById("whatsapp").value = person.whatsapp || "";
+  document.getElementById("email").value = person.email || "";
+  document.getElementById("instagram").value = person.instagram || "";
+  document.getElementById("tiktok").value = person.tiktok || "";
+  document.getElementById("portfolio").value = person.portfolio || "";
+  document.getElementById("linkedin").value = person.linkedin || "";
+  pitchEl.value = person.pitch || "";
+  pitchCount.textContent = pitchEl.value.length;
+
+  const countrySel = document.getElementById("country");
+  countrySel.value = COUNTRIES.includes(person.country) ? person.country : "";
+
+  const profSel = document.getElementById("profession");
+  const profOtherInput = document.getElementById("profession-other");
+  if(PROFESSIONS.includes(person.profession)){
+    profSel.value = person.profession;
+    profOtherInput.classList.add("hidden"); profOtherInput.required = false;
+  } else {
+    profSel.value = "Otro";
+    profOtherInput.classList.remove("hidden"); profOtherInput.required = true;
+    profOtherInput.value = person.profession || "";
+  }
+
+  const nicheSel = document.getElementById("niche");
+  const nicheOtherInput = document.getElementById("niche-other");
+  if(NICHES.includes(person.niche)){
+    nicheSel.value = person.niche;
+    nicheOtherInput.classList.add("hidden"); nicheOtherInput.required = false;
+  } else {
+    nicheSel.value = "Otro";
+    nicheOtherInput.classList.remove("hidden"); nicheOtherInput.required = true;
+    nicheOtherInput.value = person.niche || "";
+  }
+
+  submitBtnText.textContent = "Guardar cambios";
+  cancelEditBtn.classList.remove("hidden");
+  hintCreate.classList.add("hidden");
+  hintEdit.classList.remove("hidden");
+
+  switchView("view-form");
+  window.scrollTo({top:0, behavior:"auto"});
+}
+
+cancelEditBtn.addEventListener("click", ()=>{
+  enterCreateMode();
+  switchView("view-dashboard");
+  loadDirectoryData();
+});
+
+/* -----------------------------------------------------------
+   8. VALIDACIÓN Y ENVÍO DEL FORMULARIO (crear o editar)
+   ----------------------------------------------------------- */
+form.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+
+  if(!form.checkValidity()){
+    form.reportValidity();
+    return;
+  }
+
+  const role = form.querySelector('input[name="role"]:checked');
+  if(!role){
+    alert("Por favor selecciona si eres Cliente o Profesional.");
+    return;
+  }
+
+  // Bloqueo: ya se registró con este rol antes (solo aplica al crear, no al editar).
+  if(formMode === "create"){
+    const registros = getLocalRegistros();
+    if(registros[role.value]){
+      alert(`Ya te registraste antes como ${role.value} desde este dispositivo. Ve al Directorio, sección "Mis perfiles registrados", y usa el botón Editar si necesitas corregir algo.`);
+      return;
+    }
+  }
+
+  const whatsapp = document.getElementById("whatsapp").value.trim();
+  if(!whatsapp.startsWith("+") || whatsapp.replace(/\D/g,"").length < 8){
+    alert("Ingresa tu WhatsApp con el código de país. Ejemplo: +57 300 1234567");
+    return;
+  }
+
+  const instagram = document.getElementById("instagram").value.trim();
+  if(!isValidUrl(instagram)){
+    alert("El link de Instagram no es válido. Debe empezar con http:// o https://");
+    return;
+  }
+
+  const tiktok = document.getElementById("tiktok").value.trim();
+  if(tiktok && !isValidUrl(tiktok)){
+    alert("El link de TikTok no es válido. Debe empezar con http:// o https://");
+    return;
+  }
+
+  const portfolio = document.getElementById("portfolio").value.trim();
+  if(portfolio && !isValidUrl(portfolio)){
+    alert("El link de Portafolio/Web no es válido. Debe empezar con http:// o https://");
+    return;
+  }
+
+  const linkedin = document.getElementById("linkedin").value.trim();
+  if(linkedin && !isValidUrl(linkedin)){
+    alert("El link de LinkedIn no es válido. Debe empezar con http:// o https://");
+    return;
+  }
+
+  const professionSelect = document.getElementById("profession").value;
+  const professionFinal = professionSelect === "Otro"
+    ? document.getElementById("profession-other").value.trim()
+    : professionSelect;
+
+  const nicheSelect = document.getElementById("niche").value;
+  const nicheFinal = nicheSelect === "Otro"
+    ? document.getElementById("niche-other").value.trim()
+    : nicheSelect;
+
+  if(professionSelect === "Otro" && !professionFinal){
+    alert("Cuéntanos cuál es tu profesión o servicio.");
+    return;
+  }
+  if(nicheSelect === "Otro" && !nicheFinal){
+    alert("Cuéntanos cuál es tu nicho.");
+    return;
+  }
+
+  const payload = {
+    role: role.value,
+    name: document.getElementById("name").value.trim(),
+    country: document.getElementById("country").value,
+    profession: professionFinal,
+    niche: nicheFinal,
+    pitch: pitchEl.value.trim(),
+    whatsapp: whatsapp,
+    email: document.getElementById("email").value.trim(),
+    instagram: instagram,
+    tiktok: tiktok,
+    portfolio: portfolio,
+    linkedin: linkedin
+  };
+
+  if(formMode === "create"){
+    // Verificación de duplicados por Instagram/correo, dentro del mismo rol.
+    if(dataLoaded){
+      const igNuevo = normalizeForCompare(instagram);
+      const emailNuevo = normalizeForCompare(payload.email);
+
+      const yaExiste = directoryData.some(person=>{
+        if((person.role || "") !== payload.role) return false;
+        const igExistente = normalizeForCompare(person.instagram || "");
+        const emailExistente = normalizeForCompare(person.email || "");
+        return (igNuevo && igNuevo === igExistente) || (emailNuevo && emailNuevo === emailExistente);
+      });
+
+      if(yaExiste){
+        alert("Este Instagram o correo ya está registrado en el directorio para este rol 🙌\n\nSi ya te habías registrado antes, no es necesario volver a hacerlo. Si crees que es un error, escríbenos a corporativo@aurushen.com.");
+        return;
+      }
+    }
+  }
+
+  submitBtn.disabled = true;
+  submitBtnText.textContent = formMode === "edit" ? "Guardando..." : "Enviando...";
+
+  try{
+    const body = formMode === "edit"
+      ? Object.assign({ action: "update", id: editingId }, payload)
+      : Object.assign({ action: "create" }, payload);
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+
+    if(data.status !== "ok"){
+      if(data.code === "already_edited"){
+        alert("Este registro ya usó su única edición permitida. Para otro cambio, escríbenos a corporativo@aurushen.com.");
+      } else if(data.code === "duplicate"){
+        alert("Ese Instagram o correo ya está registrado para este rol.");
+      } else {
+        throw new Error(data.message || "Error desconocido");
+      }
+      submitBtn.disabled = false;
+      submitBtnText.textContent = formMode === "edit" ? "Guardar cambios" : "Registrarme y desbloquear el Directorio";
+      return;
+    }
+
+    dataLoaded = false; // fuerza recarga fresca del directorio
+
+    if(formMode === "edit"){
+      const registros = getLocalRegistros();
+      registros[editingRole] = { id: editingId, editado: true };
+      saveLocalRegistros(registros);
+
+      alert("¡Listo! Tus cambios se guardaron. Ya usaste tu única edición para este perfil.");
+      enterCreateMode();
+      switchView("view-dashboard");
+      loadDirectoryData();
+    } else {
+      const registros = getLocalRegistros();
+      registros[payload.role] = { id: data.id, editado: false };
+      saveLocalRegistros(registros);
+
+      document.getElementById("confirmation-title").textContent = "¡Listo, ya estás dentro!";
+      document.getElementById("confirmation-text").textContent = hasBothRegistros()
+        ? "Tu registro fue recibido. Ya tienes tus 2 perfiles activos (Cliente y Profesional). Explora el directorio y sigue a la comunidad."
+        : "Tu registro fue recibido. Ya puedes explorar el directorio, seguir a la comunidad en Instagram y empezar a apoyarnos entre todos.";
+
+      unlockDashboard();
+      updateRegistroNavState();
+      switchView("view-confirmation");
+    }
+
+  }catch(err){
+    console.error(err);
+    alert("Hubo un problema al enviar tu registro. Revisa tu conexión e inténtalo de nuevo.");
+    submitBtn.disabled = false;
+    submitBtnText.textContent = formMode === "edit" ? "Guardar cambios" : "Registrarme y desbloquear el Directorio";
+  }finally{
+    submitBtn.disabled = false;
+    if(formMode === "create"){
+      submitBtnText.textContent = "Registrarme y desbloquear el Directorio";
+    }
+  }
+});
+
+/* -----------------------------------------------------------
+   9. DESBLOQUEO DEL DASHBOARD Y ESTADO DEL BOTÓN "REGISTRO"
+   ----------------------------------------------------------- */
+const navDashboardBtn = document.getElementById("nav-dashboard-btn");
+const navFormBtn = document.getElementById("nav-form-btn");
+
+function unlockDashboard(){
+  navDashboardBtn.disabled = false;
+  navDashboardBtn.classList.remove("locked");
+  navDashboardBtn.innerHTML = "Directorio";
+}
+
+// El botón "Registro" se bloquea solo cuando ya se usaron los 2 registros posibles.
+function updateRegistroNavState(){
+  if(hasBothRegistros()){
+    navFormBtn.disabled = true;
+    navFormBtn.classList.add("locked");
+    navFormBtn.innerHTML = '<span class="lock-icon">🔒</span> Registro';
+    navFormBtn.title = "Ya usaste tus 2 registros posibles (Cliente y Profesional).";
+  } else {
+    navFormBtn.disabled = false;
+    navFormBtn.classList.remove("locked");
+    navFormBtn.innerHTML = "Registro";
+    navFormBtn.title = "";
+  }
+}
+
+function checkUnlockState(){
+  if(hasAnyRegistro()){
+    unlockDashboard();
+    updateRegistroNavState();
+    switchView("view-dashboard");
+    loadDirectoryData();
+  }
+}
+
+function selectTab(role){
+  currentTab = role;
+  document.querySelectorAll(".tab-btn").forEach(b=>{
+    const isActive = b.dataset.role === role;
+    b.classList.toggle("active", isActive);
+    b.setAttribute("aria-selected", isActive ? "true" : "false");
+  });
+}
+
+/* -----------------------------------------------------------
+   10. NAVEGACIÓN GLOBAL
+   ----------------------------------------------------------- */
+navFormBtn.addEventListener("click", ()=>{
+  if(navFormBtn.disabled) return;
+  if(formMode !== "edit") enterCreateMode();
+  switchView("view-form");
+});
+
+navDashboardBtn.addEventListener("click", ()=>{
+  if(navDashboardBtn.disabled) return;
+  switchView("view-dashboard");
+  loadDirectoryData();
+});
+
+document.getElementById("go-dashboard-btn").addEventListener("click", ()=>{
+  switchView("view-dashboard");
+  loadDirectoryData();
+});
+
+/* -----------------------------------------------------------
+   11. GUÍA (modal informativo)
+   ----------------------------------------------------------- */
+const guideModal = document.getElementById("guide-modal");
+document.getElementById("nav-guide-btn").addEventListener("click", ()=>{
+  guideModal.classList.remove("hidden");
+  guideModal.setAttribute("aria-hidden","false");
+});
+function closeGuideModal(){
+  guideModal.classList.add("hidden");
+  guideModal.setAttribute("aria-hidden","true");
+}
+document.getElementById("guide-modal-close").addEventListener("click", closeGuideModal);
+document.getElementById("guide-modal-overlay").addEventListener("click", closeGuideModal);
+
+/* -----------------------------------------------------------
+   12. BANNER DEL DASHBOARD
+   ----------------------------------------------------------- */
+document.getElementById("banner-close").addEventListener("click", ()=>{
+  document.getElementById("pledge-banner").classList.add("hidden");
+});
+
+/* -----------------------------------------------------------
+   13. CARGA Y RENDER DEL DIRECTORIO
+   ----------------------------------------------------------- */
+let directoryData = [];
+let dataLoaded = false;
+let currentTab = "Profesional"; // hay más freelancers que clientes, así que abre aquí por defecto.
+
+const cardsGrid = document.getElementById("cards-grid");
+const emptyState = document.getElementById("empty-state");
+const loadingState = document.getElementById("loading-state");
+const resultsCount = document.getElementById("results-count");
+
+async function loadDirectoryData(){
+  if(dataLoaded) { renderCards(); renderMyProfiles(); return; }
+
+  loadingState.classList.remove("hidden");
+  cardsGrid.innerHTML = "";
+  emptyState.classList.add("hidden");
+
+  try{
+    const res = await fetch(API_URL, { method: "GET" });
+    const data = await res.json();
+    directoryData = Array.isArray(data) ? data : (data.data || []);
+    dataLoaded = true;
+    renderCards();
+    renderMyProfiles();
+  }catch(err){
+    console.error(err);
+    loadingState.textContent = "No pudimos cargar el directorio. Intenta de nuevo más tarde.";
+  }finally{
+    loadingState.classList.add("hidden");
+  }
+}
+
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    selectTab(btn.dataset.role);
+    renderCards();
+  });
+});
+
+const searchInput = document.getElementById("search-input");
+const filterCountry = document.getElementById("filter-country");
+const filterProfession = document.getElementById("filter-profession");
+const filterNiche = document.getElementById("filter-niche");
+
+[searchInput, filterCountry, filterProfession, filterNiche].forEach(el=>{
+  el.addEventListener("input", renderCards);
+  el.addEventListener("change", renderCards);
+});
+
+document.getElementById("clear-filters-btn").addEventListener("click", ()=>{
+  searchInput.value = "";
+  filterCountry.value = "";
+  filterProfession.value = "";
+  filterNiche.value = "";
+  renderCards();
+});
+
+function renderCards(){
+  const search = searchInput.value.trim().toLowerCase();
+  const country = filterCountry.value;
+  const profession = filterProfession.value;
+  const niche = filterNiche.value;
+
+  const filtered = directoryData.filter(person=>{
+    if((person.role || "") !== currentTab) return false;
+    const name = (person.name || "").toLowerCase();
+    if(search && !name.includes(search)) return false;
+    if(country && (person.country || "") !== country) return false;
+    if(profession && (person.profession || "") !== profession) return false;
+    if(niche && (person.niche || "") !== niche) return false;
+    return true;
+  });
+
+  cardsGrid.innerHTML = "";
+  resultsCount.textContent = `${filtered.length} resultado${filtered.length===1?"":"s"}`;
+
+  if(filtered.length === 0){
+    emptyState.classList.remove("hidden");
+    return;
+  }
+  emptyState.classList.add("hidden");
+
+  filtered.forEach(person=>{
+    const card = document.createElement("div");
+    card.className = "profile-card";
+    const name = person.name || "Sin nombre";
+    const profession = person.profession || "";
+    const niche = person.niche || "";
+    const country = person.country || "";
+
+    card.innerHTML = `
+      <span class="card-tag">${escapeHtml(profession)}</span>
+      <span class="card-name">${escapeHtml(name)}</span>
+      <span class="card-meta">${escapeHtml(niche)} · ${escapeHtml(country)}</span>
+      <button type="button" class="card-cta">Ver Perfil Completo →</button>
+    `;
+    card.querySelector(".card-cta").addEventListener("click", ()=> openModal(person));
+    cardsGrid.appendChild(card);
+  });
+}
+
+/* -----------------------------------------------------------
+   13.1 "MIS PERFILES" — con botón Editar (1 sola vez por perfil)
+   ----------------------------------------------------------- */
+const myProfilesSection = document.getElementById("my-profiles-section");
+const myProfilesList = document.getElementById("my-profiles-list");
+
+function renderMyProfiles(){
+  const registros = getLocalRegistros();
+  const roles = Object.keys(registros);
+
+  if(roles.length === 0){
+    myProfilesSection.classList.add("hidden");
+    return;
+  }
+
+  myProfilesList.innerHTML = "";
+
+  roles.forEach(role=>{
+    const localInfo = registros[role];
+    const person = directoryData.find(p => p.id === localInfo.id);
+
+    const chip = document.createElement("div");
+    chip.className = "my-profile-chip";
+
+    const displayName = person ? (person.name || "Sin nombre") : "Cargando...";
+    const editadoBackend = person ? (String(person.editado||"").toLowerCase()==="sí" || String(person.editado||"").toLowerCase()==="si") : localInfo.editado;
+
+    chip.innerHTML = `
+      <div class="chip-info">Perfil <b>${escapeHtml(role)}</b> — ${escapeHtml(displayName)}</div>
+      ${editadoBackend
+        ? `<span class="chip-locked">🔒 Ya editado</span>`
+        : `<button type="button" class="chip-edit-btn">✏️ Editar</button>`}
+    `;
+
+    if(!editadoBackend){
+      chip.querySelector(".chip-edit-btn").addEventListener("click", ()=>{
+        if(!person){
+          alert("Aún estamos cargando tu registro. Intenta de nuevo en un momento.");
+          return;
+        }
+        enterEditMode(person, role, localInfo.id);
+      });
+    }
+
+    myProfilesList.appendChild(chip);
+  });
+
+  // Sincroniza el flag "editado" local con lo que diga el backend (por si se
+  // editó desde otro dispositivo o se perdió el localStorage a medias).
+  let changed = false;
+  roles.forEach(role=>{
+    const person = directoryData.find(p => p.id === registros[role].id);
+    if(person){
+      const editadoBackend = String(person.editado||"").toLowerCase()==="sí" || String(person.editado||"").toLowerCase()==="si";
+      if(registros[role].editado !== editadoBackend){
+        registros[role].editado = editadoBackend;
+        changed = true;
+      }
+    }
+  });
+  if(changed) saveLocalRegistros(registros);
+
+  myProfilesSection.classList.remove("hidden");
+}
+
+/* -----------------------------------------------------------
+   14. MODAL DE PERFIL COMPLETO
+   ----------------------------------------------------------- */
+const modal = document.getElementById("profile-modal");
+const modalBody = document.getElementById("modal-body");
+
+function buildModalHtml(person){
+  const name = person.name || "Sin nombre";
+  const profession = person.profession || "";
+  const niche = person.niche || "";
+  const country = person.country || "";
+  const pitch = person.pitch || "";
+  const email = person.email || "";
+  const whatsapp = person.whatsapp || "";
+  const instagram = person.instagram || "";
+  const tiktok = person.tiktok || "";
+  const portfolio = person.portfolio || "";
+  const linkedin = person.linkedin || "";
+
+  const waDigits = (whatsapp||"").replace(/\D/g,"");
+  const initials = name.split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();
+
+  return `
+    <div class="modal-head">
+      <div class="modal-avatar">${escapeHtml(initials)}</div>
+      <div>
+        <h2>${escapeHtml(name)}</h2>
+        <div class="modal-tags">
+          ${profession ? `<span>${escapeHtml(profession)}</span>` : ""}
+          ${niche ? `<span>${escapeHtml(niche)}</span>` : ""}
+          ${country ? `<span>${escapeHtml(country)}</span>` : ""}
+        </div>
+      </div>
+    </div>
+
+    ${pitch ? `<div class="modal-pitch">${escapeHtml(pitch)}</div>` : ""}
+
+    <div class="modal-contact">
+      ${email ? `<div class="contact-row">✉️ <a href="mailto:${encodeURI(email)}">${escapeHtml(email)}</a></div>` : ""}
+    </div>
+
+    <div class="modal-links">
+      ${waDigits
+        ? `<a class="link-btn whatsapp" href="https://wa.me/${waDigits}" target="_blank" rel="noopener">💬 WhatsApp</a>`
+        : `<span class="link-btn disabled">💬 WhatsApp</span>`}
+      ${instagram
+        ? `<a class="link-btn" href="${encodeURI(instagram)}" target="_blank" rel="noopener">📷 Instagram</a>`
+        : `<span class="link-btn disabled">📷 Instagram</span>`}
+      ${tiktok
+        ? `<a class="link-btn" href="${encodeURI(tiktok)}" target="_blank" rel="noopener">🎵 TikTok</a>`
+        : `<span class="link-btn disabled">🎵 TikTok</span>`}
+      ${portfolio
+        ? `<a class="link-btn" href="${encodeURI(portfolio)}" target="_blank" rel="noopener">🌐 Portafolio</a>`
+        : `<span class="link-btn disabled">🌐 Portafolio</span>`}
+      ${linkedin
+        ? `<a class="link-btn" href="${encodeURI(linkedin)}" target="_blank" rel="noopener">💼 LinkedIn</a>`
+        : `<span class="link-btn disabled">💼 LinkedIn</span>`}
+      ${email
+        ? `<a class="link-btn email" href="mailto:${encodeURI(email)}">✉️ Correo</a>`
+        : ""}
+    </div>
+  `;
+}
+
+function openModal(person){
+  modalBody.innerHTML = buildModalHtml(person);
+  modal.classList.remove("hidden");
+  modal.setAttribute("aria-hidden","false");
+}
+
+function closeModal(){
+  modal.classList.add("hidden");
+  modal.setAttribute("aria-hidden","true");
+}
+
+document.getElementById("modal-close").addEventListener("click", closeModal);
+document.getElementById("modal-overlay").addEventListener("click", closeModal);
+document.addEventListener("keydown", (e)=>{
+  if(e.key === "Escape"){ closeModal(); closeGuideModal(); }
+});
+
+// Perfil de la fundadora (siempre visible, con sus datos reales)
+document.getElementById("founder-cta-btn").addEventListener("click", ()=> openModal(FOUNDER_PROFILE));
+
+/* -----------------------------------------------------------
+   15. ARRANQUE DE LA PÁGINA
+   ----------------------------------------------------------- */
+const yaEstabaRegistrado = hasAnyRegistro();
+checkUnlockState();
+if(!yaEstabaRegistrado){
+  preloadDirectoryData();
+}
+
+</script>
+</body>
+</html>
