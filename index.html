@@ -851,7 +851,7 @@ textarea{ resize: vertical; min-height: 110px; }
       </p>
       <div class="pledge-box">
         <strong>El compromiso de esta comunidad:</strong>
-        <p>Somos cerca de 700 emprendedores y freelancers. Si cada uno sigue,
+        <p>Somos +700 emprendedores y freelancers. Si cada uno sigue,
           comenta y apoya a los demás, en los próximos 10 días podemos conseguir
           entre todos <strong>mínimo 500 seguidores nuevos por persona</strong>.
           Entra al directorio, sigue a quienes encuentres y crezcamos juntos. 🤝📈</p>
@@ -974,7 +974,7 @@ textarea{ resize: vertical; min-height: 110px; }
 /* -----------------------------------------------------------
    1. CONFIGURACIÓN
    ----------------------------------------------------------- */
-const API_URL = "https://script.google.com/macros/s/AKfycbyKpMTVdDla4Ueb2E_AXCcwNRNnmNhJeeT2qll66cTDnbwaFBPhc2BF3textJ2QAHYN/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwrnwQyU0XsvhPO_qAnKvo5yGpby8PUHMPHOBDM1Tp0lZl2QZgijbq42wDkj8AOADQE/exec";
 
 const STORAGE_KEY = "directorio_registros_v3";
 
@@ -1188,7 +1188,13 @@ function enterEditMode(person, role, id){
   roleInputs.forEach(r=> r.disabled = true);
 
   document.getElementById("name").value = person.name || "";
-  document.getElementById("whatsapp").value = person.whatsapp || "";
+  // Fix: algunos registros antiguos perdieron el "+" inicial del WhatsApp
+  // porque Google Sheets lo interpretó como número al guardarlo (ver Code.gs).
+  // Si el valor guardado no empieza con "+", se lo anteponemos aquí para
+  // que la persona no tenga que volver a escribirlo a mano.
+  let waValue = (person.whatsapp || "").toString().trim();
+  if(waValue && !waValue.startsWith("+")) waValue = "+" + waValue;
+  document.getElementById("whatsapp").value = waValue;
   document.getElementById("email").value = person.email || "";
   document.getElementById("instagram").value = person.instagram || "";
   document.getElementById("tiktok").value = person.tiktok || "";
@@ -1376,21 +1382,12 @@ form.addEventListener("submit", async (e)=>{
     }
 
     if(formMode === "edit"){
-      // Refrescamos el directorio completo para traer los datos ya editados.
-      // Si el refresh falla por red, aplicamos un parche optimista local
-      // para que "Mis perfiles" no muestre información vieja.
-      try{
-        const freshRes = await fetch(API_URL, { method: "GET" });
-        const freshData = await freshRes.json();
-        directoryData = Array.isArray(freshData) ? freshData : (freshData.data || []);
-        dataLoaded = true;
-      }catch(refreshErr){
-        console.warn("No se pudo refrescar el directorio tras la edición:", refreshErr);
-        const idx = directoryData.findIndex(p => String(p.id) === String(editingId));
-        const patched = Object.assign({}, idx !== -1 ? directoryData[idx] : {}, payload, { id: editingId, editado: "Sí" });
-        if(idx !== -1) directoryData[idx] = patched; else directoryData.push(patched);
-        dataLoaded = true;
-      }
+      // Fix: en vez de intentar "parchar" directoryData a mano (lo que podía
+      // dejar datos incompletos si el refresco fallaba y nunca se reintentaba),
+      // simplemente invalidamos la caché. La próxima vez que se entre al
+      // Directorio, loadDirectoryData() hará una carga real y completa.
+      registroEnviado = true;
+      dataLoaded = false;
 
       const registros = getLocalRegistros();
       registros[editingRole] = { id: editingId, editado: true };
@@ -1401,23 +1398,13 @@ form.addEventListener("submit", async (e)=>{
       switchView("view-dashboard");
       loadDirectoryData();
     } else {
+      // Fix: mismo criterio que en edición — invalidamos la caché en vez de
+      // intentar reconstruirla a mano. Esto es lo que garantiza que, al
+      // entrar al Directorio, SIEMPRE se vean todos los perfiles (incluidos
+      // los de los demás) y no solo el propio, sin importar si el refresco
+      // automático que había aquí antes alcanzaba a completarse o no.
       registroEnviado = true; // bloquea que la precarga vieja sobreescriba lo nuevo
-
-      // Refrescamos el directorio completo para traer el registro recién creado.
-      // Si el refresh falla por red, insertamos una copia optimista local
-      // (con los mismos datos que se enviaron) para que "Mis perfiles" y el
-      // botón Editar queden disponibles de inmediato de todas formas.
-      try{
-        const freshRes = await fetch(API_URL, { method: "GET" });
-        const freshData = await freshRes.json();
-        directoryData = Array.isArray(freshData) ? freshData : (freshData.data || []);
-        dataLoaded = true;
-      }catch(refreshErr){
-        console.warn("No se pudo refrescar el directorio tras el envío:", refreshErr);
-        const optimistic = Object.assign({}, payload, { id: data.id, editado: "No" });
-        if(!directoryData.some(p => String(p.id) === String(data.id))) directoryData.push(optimistic);
-        dataLoaded = true;
-      }
+      dataLoaded = false;
 
       const registros = getLocalRegistros();
       registros[payload.role] = { id: data.id, editado: false };
