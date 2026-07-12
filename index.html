@@ -511,6 +511,7 @@ textarea{ resize: vertical; min-height: 110px; }
 }
 .profile-card:hover{ border-color: var(--blue-lt); transform: translateY(-3px); }
 .profile-card .card-name{ font-family: var(--font-display); font-weight:700; font-size:1.05rem; }
+.profile-card .card-badges{ display:flex; gap:6px; flex-wrap:wrap; }
 .profile-card .card-tag{
   display:inline-block;
   font-size:.75rem;
@@ -520,6 +521,10 @@ textarea{ resize: vertical; min-height: 110px; }
   padding: 3px 10px;
   border-radius: 999px;
   width: fit-content;
+}
+.profile-card .card-tag.card-tag-country{
+  color: var(--blue-dk);
+  background: rgba(74,112,169,0.14);
 }
 .profile-card .card-meta{ font-size:.85rem; color:#666; }
 .card-cta{
@@ -1620,9 +1625,12 @@ function renderCards(){
     const country = person.country || "";
 
     card.innerHTML = `
-      <span class="card-tag">${escapeHtml(profession)}</span>
+      <div class="card-badges">
+        <span class="card-tag">${escapeHtml(profession)}</span>
+        ${country ? `<span class="card-tag card-tag-country">📍 ${escapeHtml(country)}</span>` : ""}
+      </div>
       <span class="card-name">${escapeHtml(name)}</span>
-      <span class="card-meta">${escapeHtml(niche)} · ${escapeHtml(country)}</span>
+      <span class="card-meta">${escapeHtml(niche)}</span>
       <button type="button" class="card-cta">Ver Perfil Completo →</button>
     `;
     card.querySelector(".card-cta").addEventListener("click", ()=> openModal(person));
