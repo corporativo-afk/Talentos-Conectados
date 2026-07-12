@@ -1483,7 +1483,14 @@ function selectTab(role){
    ----------------------------------------------------------- */
 navFormBtn.addEventListener("click", ()=>{
   if(navFormBtn.disabled) return;
-  if(formMode !== "edit") enterCreateMode();
+  // Fix: el botón "Registro" del menú SIEMPRE debe abrir un formulario
+  // limpio en modo creación. Antes, si el usuario había entrado antes a
+  // "Editar" un perfil y salía sin darle a "Cancelar edición" (por ejemplo,
+  // navegando directo a "Directorio"), el formulario quedaba atascado en
+  // modo edición, bloqueando el radio Cliente/Profesional y dejando a la
+  // persona sin poder registrar su segundo rol. Ahora, sin importar el
+  // estado previo, este botón resetea siempre a modo creación.
+  enterCreateMode();
   switchView("view-form");
 });
 
