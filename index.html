@@ -611,6 +611,7 @@ textarea{ resize: vertical; min-height: 110px; }
 .link-btn.whatsapp{ background: var(--blue-dk); color:var(--white); border-color: var(--blue-dk); }
 .link-btn.whatsapp:hover{ background: var(--ink); }
 .link-btn.email{ background: var(--navy); color:var(--white); border-color: var(--navy); }
+.link-btn:disabled{ opacity:.75; cursor:default; transform:none !important; }
 
 .guide-content h3{ color: var(--blue-dk); font-size:1.05rem; margin-top:22px; }
 .guide-content h3:first-child{ margin-top:0; }
@@ -959,7 +960,7 @@ textarea{ resize: vertical; min-height: 110px; }
         <a href="mailto:corporativo@aurushen.com">corporativo@aurushen.com</a>.</p>
 
       <h3>5. ¿Necesitas un sistema como este?</h3>
-      <p>Este directorio fue creado por Mariángel, quien también diseña sistemas a la medida
+      <p>Este directorio fue creado por Mariangel, quien también diseña sistemas a la medida
         para negocios y comunidades. Revisa su perfil (fijado arriba en el Directorio) para más info.</p>
     </div>
   </div>
@@ -973,22 +974,24 @@ textarea{ resize: vertical; min-height: 110px; }
 /* -----------------------------------------------------------
    1. CONFIGURACIÓN
    ----------------------------------------------------------- */
-const API_URL = "https://script.google.com/macros/s/AKfycbw9_kuW0EUmiDg8nyuqBMLg7-k1cmaxihqht3DGVGWXnHqpr7UNViU0-q_hZG19sumR/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyKpMTVdDla4Ueb2E_AXCcwNRNnmNhJeeT2qll66cTDnbwaFBPhc2BF3textJ2QAHYN/exec";
 
 const STORAGE_KEY = "directorio_registros_v3";
 
 // Perfil fijo de la fundadora (no viene de la hoja de cálculo).
+// NOTA para Mariangel: cuando tengas listo tu link de portafolio, pégalo
+// abajo en "portfolio" (entre las comillas) y quedará visible en tu perfil.
 const FOUNDER_PROFILE = {
   name: "Mariangel Vivas",
   profession: "Analista de Sistemas",
   niche: "Comunidades & Automatizaciones",
   country: "Colombia",
-  pitch: "Mariángel | Analista de Sistemas y Arquitecta Digital ⚙️\n\nNo construyo webs de adorno; resuelvo cuellos de botella tecnológicos. Analizo el funcionamiento de tu negocio, identifico dónde estás perdiendo tiempo o dinero (fricciones) y diseño sistemas a la medida de lo que realmente necesitas.\n\n¿Qué problemas resuelvo?\n\nCaos de prospectos: ¿Tienes a tu comunidad y posibles clientes regados por chats y correos? Los alojo y organizo en un solo lugar (Skool) con automatizaciones estratégicas para que puedas vender incluso mientras duermes.\n\nHerramientas desconectadas: Conecto una plataforma con otra para que \"hablen\" entre sí, mejorando tu flujo de trabajo y eliminando el copiar y pegar manual.\n\nDesarrollo a medida: Si tienes un problema específico, creo soluciones precisas, ágiles y sencillas (justo como este Directorio que estás usando), desde bases de datos y formularios hasta ecosistemas completos.\n\nTu negocio debe trabajar para ti, no tú para él. Si necesitas sistematizar tu operación, delegar la tecnología y escalar sin estrés, entra a mis redes sociales aquí abajo y contáctame. 👇🏽",
+  pitch: "Mariangel | Analista de Sistemas y Arquitecta Digital ⚙️\n\nNo construyo webs de adorno; resuelvo cuellos de botella tecnológicos. Analizo el funcionamiento de tu negocio, identifico dónde estás perdiendo tiempo o dinero (fricciones) y diseño sistemas a la medida de lo que realmente necesitas.\n\n¿Qué problemas resuelvo?\n\nCaos de prospectos: ¿Tienes a tu comunidad y posibles clientes regados por chats y correos? Los alojo y organizo en un solo lugar (Skool) con automatizaciones estratégicas para que puedas vender incluso mientras duermes.\n\nHerramientas desconectadas: Conecto una plataforma con otra para que \"hablen\" entre sí, mejorando tu flujo de trabajo y eliminando el copiar y pegar manual.\n\nDesarrollo a medida: Si tienes un problema específico, creo soluciones precisas, ágiles y sencillas (justo como este Directorio que estás usando), desde bases de datos y formularios hasta ecosistemas completos.\n\nTu negocio debe trabajar para ti, no tú para él. Si necesitas sistematizar tu operación, delegar la tecnología y escalar sin estrés, entra a mis redes sociales aquí abajo y contáctame. 👇🏽",
   email: "corporativo@aurushen.com",
   instagram: "https://www.instagram.com/aurushen_systems/",
   tiktok: "https://www.tiktok.com/@aurushen_systems",
   linkedin: "https://www.linkedin.com/in/mariangel-vivas-4791aa2b9/",
-  whatsapp: "",
+  whatsapp: "+573332737344",
   portfolio: ""
 };
 
@@ -1055,6 +1058,13 @@ function escapeHtml(str){
   const div = document.createElement("div");
   div.textContent = str || "";
   return div.innerHTML;
+}
+
+// Igual que escapeHtml, pero además escapa comillas — necesario para
+// insertar valores dentro de atributos HTML (ej. data-value="...") sin
+// riesgo de que el valor rompa el atributo o inyecte HTML.
+function escapeAttr(str){
+  return escapeHtml(str).replace(/"/g,"&quot;").replace(/'/g,"&#39;");
 }
 
 /* -----------------------------------------------------------
@@ -1365,18 +1375,23 @@ form.addEventListener("submit", async (e)=>{
       return;
     }
 
-    registroEnviado = true; // bloquea que la precarga vieja sobreescriba lo nuevo
-    try{
-      const freshRes = await fetch(API_URL, { method: "GET" });
-      const freshData = await freshRes.json();
-      directoryData = Array.isArray(freshData) ? freshData : (freshData.data || []);
-      dataLoaded = true;
-    }catch(refreshErr){
-      console.warn("No se pudo refrescar el directorio tras el envío:", refreshErr);
-      dataLoaded = false; // se reintentará la próxima vez que se abra el Directorio
-    }
-
     if(formMode === "edit"){
+      // Refrescamos el directorio completo para traer los datos ya editados.
+      // Si el refresh falla por red, aplicamos un parche optimista local
+      // para que "Mis perfiles" no muestre información vieja.
+      try{
+        const freshRes = await fetch(API_URL, { method: "GET" });
+        const freshData = await freshRes.json();
+        directoryData = Array.isArray(freshData) ? freshData : (freshData.data || []);
+        dataLoaded = true;
+      }catch(refreshErr){
+        console.warn("No se pudo refrescar el directorio tras la edición:", refreshErr);
+        const idx = directoryData.findIndex(p => String(p.id) === String(editingId));
+        const patched = Object.assign({}, idx !== -1 ? directoryData[idx] : {}, payload, { id: editingId, editado: "Sí" });
+        if(idx !== -1) directoryData[idx] = patched; else directoryData.push(patched);
+        dataLoaded = true;
+      }
+
       const registros = getLocalRegistros();
       registros[editingRole] = { id: editingId, editado: true };
       saveLocalRegistros(registros);
@@ -1386,6 +1401,24 @@ form.addEventListener("submit", async (e)=>{
       switchView("view-dashboard");
       loadDirectoryData();
     } else {
+      registroEnviado = true; // bloquea que la precarga vieja sobreescriba lo nuevo
+
+      // Refrescamos el directorio completo para traer el registro recién creado.
+      // Si el refresh falla por red, insertamos una copia optimista local
+      // (con los mismos datos que se enviaron) para que "Mis perfiles" y el
+      // botón Editar queden disponibles de inmediato de todas formas.
+      try{
+        const freshRes = await fetch(API_URL, { method: "GET" });
+        const freshData = await freshRes.json();
+        directoryData = Array.isArray(freshData) ? freshData : (freshData.data || []);
+        dataLoaded = true;
+      }catch(refreshErr){
+        console.warn("No se pudo refrescar el directorio tras el envío:", refreshErr);
+        const optimistic = Object.assign({}, payload, { id: data.id, editado: "No" });
+        if(!directoryData.some(p => String(p.id) === String(data.id))) directoryData.push(optimistic);
+        dataLoaded = true;
+      }
+
       const registros = getLocalRegistros();
       registros[payload.role] = { id: data.id, editado: false };
       saveLocalRegistros(registros);
@@ -1622,7 +1655,10 @@ function renderMyProfiles(){
 
   roles.forEach(role=>{
     const localInfo = registros[role];
-    const person = directoryData.find(p => p.id === localInfo.id);
+    // Comparación como texto (String()) para evitar falsos negativos por
+    // diferencias de tipo entre el ID guardado localmente y el que llega
+    // del backend (ambos son strings, pero así queda a prueba de balas).
+    const person = directoryData.find(p => String(p.id) === String(localInfo.id));
 
     const chip = document.createElement("div");
     chip.className = "my-profile-chip";
@@ -1654,7 +1690,7 @@ function renderMyProfiles(){
   // editó desde otro dispositivo o se perdió el localStorage a medias).
   let changed = false;
   roles.forEach(role=>{
-    const person = directoryData.find(p => p.id === registros[role].id);
+    const person = directoryData.find(p => String(p.id) === String(registros[role].id));
     if(person){
       const editadoBackend = String(person.editado||"").toLowerCase()==="sí" || String(person.editado||"").toLowerCase()==="si";
       if(registros[role].editado !== editadoBackend){
@@ -1669,7 +1705,56 @@ function renderMyProfiles(){
 }
 
 /* -----------------------------------------------------------
-   14. MODAL DE PERFIL COMPLETO
+   14. COPIAR AL PORTAPAPELES (WhatsApp / Correo dentro del modal)
+   ----------------------------------------------------------- */
+async function copyTextToClipboard(text){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    try{
+      await navigator.clipboard.writeText(text);
+      return true;
+    }catch(e){ /* seguimos al método alterno */ }
+  }
+  // Método alterno para navegadores/webviews sin Clipboard API disponible.
+  try{
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    ta.style.pointerEvents = "none";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return ok;
+  }catch(e){
+    return false;
+  }
+}
+
+function handleCopyBtnClick(e){
+  const btn = e.currentTarget;
+  const value = btn.dataset.value;
+  if(!value || btn.disabled) return;
+
+  const type = btn.dataset.copy; // "whatsapp" | "email"
+  const originalText = btn.dataset.originalText || btn.textContent;
+  btn.dataset.originalText = originalText;
+
+  copyTextToClipboard(value).then(ok=>{
+    btn.textContent = ok
+      ? (type === "whatsapp" ? "✅ WhatsApp copiado" : "✅ Correo copiado")
+      : "❌ No se pudo copiar";
+    btn.disabled = true;
+    setTimeout(()=>{
+      btn.textContent = originalText;
+      btn.disabled = false;
+    }, 2200);
+  });
+}
+
+/* -----------------------------------------------------------
+   15. MODAL DE PERFIL COMPLETO
    ----------------------------------------------------------- */
 const modal = document.getElementById("profile-modal");
 const modalBody = document.getElementById("modal-body");
@@ -1705,13 +1790,9 @@ function buildModalHtml(person){
 
     ${pitch ? `<div class="modal-pitch">${escapeHtml(pitch)}</div>` : ""}
 
-    <div class="modal-contact">
-      ${email ? `<div class="contact-row">✉️ <a href="mailto:${encodeURI(email)}">${escapeHtml(email)}</a></div>` : ""}
-    </div>
-
     <div class="modal-links">
       ${waDigits
-        ? `<a class="link-btn whatsapp" href="https://wa.me/${waDigits}" target="_blank" rel="noopener">💬 WhatsApp</a>`
+        ? `<button type="button" class="link-btn whatsapp" data-copy="whatsapp" data-value="${escapeAttr(whatsapp)}">💬 WhatsApp</button>`
         : `<span class="link-btn disabled">💬 WhatsApp</span>`}
       ${instagram
         ? `<a class="link-btn" href="${encodeURI(instagram)}" target="_blank" rel="noopener">📷 Instagram</a>`
@@ -1726,14 +1807,17 @@ function buildModalHtml(person){
         ? `<a class="link-btn" href="${encodeURI(linkedin)}" target="_blank" rel="noopener">💼 LinkedIn</a>`
         : `<span class="link-btn disabled">💼 LinkedIn</span>`}
       ${email
-        ? `<a class="link-btn email" href="mailto:${encodeURI(email)}">✉️ Correo</a>`
-        : ""}
+        ? `<button type="button" class="link-btn email" data-copy="email" data-value="${escapeAttr(email)}">✉️ Correo</button>`
+        : `<span class="link-btn disabled">✉️ Correo</span>`}
     </div>
   `;
 }
 
 function openModal(person){
   modalBody.innerHTML = buildModalHtml(person);
+  modalBody.querySelectorAll("[data-copy]").forEach(btn=>{
+    btn.addEventListener("click", handleCopyBtnClick);
+  });
   modal.classList.remove("hidden");
   modal.setAttribute("aria-hidden","false");
 }
@@ -1753,7 +1837,7 @@ document.addEventListener("keydown", (e)=>{
 document.getElementById("founder-cta-btn").addEventListener("click", ()=> openModal(FOUNDER_PROFILE));
 
 /* -----------------------------------------------------------
-   15. ARRANQUE DE LA PÁGINA
+   16. ARRANQUE DE LA PÁGINA
    ----------------------------------------------------------- */
 const yaEstabaRegistrado = hasAnyRegistro();
 checkUnlockState();
